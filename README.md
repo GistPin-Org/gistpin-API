@@ -1,6 +1,6 @@
-# GistPin Backend
+# Gist API
 
-The backend API and on-chain indexer for GistPin. This service is the bridge between your clients (web + mobile) and both the Stellar/Soroban blockchain and the Postgres database.
+The backend API and on-chain indexer for Gist. This service is the bridge between your clients (web + mobile) and both the Stellar/Soroban blockchain and the Postgres database.
 
 ---
 
@@ -8,7 +8,7 @@ The backend API and on-chain indexer for GistPin. This service is the bridge bet
 
 - **Indexes** on-chain events from the `GistRegistry` Soroban contract
 - **Stores** enriched gist data in Postgres + PostGIS for fast geospatial queries
-- **Exposes** a REST API consumed by `gistpin-web` and `gistpin-mobile`
+- **Exposes** a REST API consumed by `gist-web` and `gist-mobile`
 - **Bridges** to IPFS/Arweave for full gist content storage (the chain only holds a hash)
 
 ---
@@ -31,7 +31,7 @@ The backend API and on-chain indexer for GistPin. This service is the bridge bet
 ## Project Layout
 
 ```
-gistpin-backend/
+gist-backend/
 ├── src/
 │   ├── main.ts                    # App bootstrap
 │   ├── app.module.ts              # Root module
@@ -74,7 +74,7 @@ gistpin-backend/
 - **PostgreSQL 15** with the **PostGIS extension** — see database setup options below
 - **npm** (comes with Node.js — no extra install needed)
 
-> **Why PostGIS?** The core feature of GistPin is querying gists by distance — *"show me everything within 500m of this coordinate."* Plain Postgres can't do that efficiently. PostGIS adds a spatial index that makes this instant, even at scale. It's not a separate database — just one extension enabled inside your existing Postgres.
+> **Why PostGIS?** The core feature of Gist is querying gists by distance — *"show me everything within 500m of this coordinate."* Plain Postgres can't do that efficiently. PostGIS adds a spatial index that makes this instant, even at scale. It's not a separate database — just one extension enabled inside your existing Postgres.
 
 ---
 
@@ -83,8 +83,8 @@ gistpin-backend/
 ### 1. Clone and install
 
 ```bash
-git clone https://github.com/gistpin/gistpin-backend.git
-cd gistpin-backend
+git clone https://github.com/gist-app/gist-backend.git
+cd gist-backend
 npm install
 ```
 
@@ -102,7 +102,7 @@ Requires [Docker Desktop](https://www.docker.com/products/docker-desktop/) or Do
 docker-compose up -d
 ```
 
-This starts a `postgis/postgis:15-3.3` container on port `5432` with the credentials from `docker-compose.yml` (`user: gistpin`, `password: gistpin`, `db: gistpin`). PostGIS is pre-installed in this image — nothing else to do.
+This starts a `postgis/postgis:15-3.3` container on port `5432` with the credentials from `docker-compose.yml` (`user: gist`, `password: gist`, `db: gist`). PostGIS is pre-installed in this image — nothing else to do.
 
 ---
 
@@ -132,10 +132,10 @@ psql -U postgres
 ```
 
 ```sql
-CREATE USER gistpin WITH PASSWORD 'gistpin';
-CREATE DATABASE gistpin OWNER gistpin;
+CREATE USER gist WITH PASSWORD 'gist';
+CREATE DATABASE gist OWNER gist;
 -- Connect to the new database and enable PostGIS
-\c gistpin
+\c gist
 CREATE EXTENSION postgis;
 \q
 ```
@@ -158,9 +158,9 @@ NODE_ENV=development
 # Database — match whatever you set in step 2
 DATABASE_HOST=localhost
 DATABASE_PORT=5432
-DATABASE_USER=gistpin
-DATABASE_PASSWORD=gistpin
-DATABASE_NAME=gistpin
+DATABASE_USER=gist
+DATABASE_PASSWORD=gist
+DATABASE_NAME=gist
 
 # Soroban / Stellar
 SOROBAN_RPC_URL=https://soroban-testnet.stellar.org
@@ -309,10 +309,10 @@ This keeps the DB in sync with on-chain state, and ensures any gist posted direc
 
 ## Working with the Contracts
 
-If you're also developing `gistpin-contracts`, run a local Stellar network:
+If you're also developing `gist-contracts`, run a local Stellar network:
 
 ```bash
-# In gistpin-contracts repo
+# In gist-contracts repo
 stellar network start local
 
 # Deploy the contract, then copy the contract ID into your .env:
@@ -345,4 +345,4 @@ The Soroban service (`src/soroban/soroban.service.ts`) wraps `@stellar/stellar-s
 - All new behaviour should come with a unit or e2e test.
 - For PostGIS queries, add explain-analyse output to your PR description so we can review query plans.
 
-For global contribution rules: [gistpin-meta/CONTRIBUTING.md](https://github.com/gistpin/gistpin-meta/blob/main/CONTRIBUTING.md)
+For global contribution rules: [gist-meta/CONTRIBUTING.md](https://github.com/gist-app/gist-meta/blob/main/CONTRIBUTING.md)
